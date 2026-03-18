@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Attendance Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-blue: #0ea5e9;
+            --dark-navy: #0f172a;
+            --bg-dark-blue: #1e293b;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --border-radius: 12px;
+        }
+
+        body {
+            background-color: var(--dark-navy); 
+            background-image: radial-gradient(circle at top left, #1e293b 0%, #0f172a 100%);
+            color: var(--dark-navy);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .form-container {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 750px;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header-section h2 { margin: 0; color: var(--dark-navy); font-size: 1.8rem; font-weight: 700; }
+        .header-section p { color: #64748b; font-size: 0.95rem; margin-top: 0.5rem; }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--dark-navy);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-sizing: border-box;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, textarea:focus { outline: none; border-color: var(--primary-blue); }
+
+        #studentList { width: 100%; }
+
+        .student-row-wrapper {
+            position: relative;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        .student-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 100%;
+        }
+
+        textarea.auto-expand {
+            resize: none;
+            min-height: 45px;
+            margin-bottom: 0;
+        }
+
+        .remove-btn {
+            position: absolute;
+            right: -55px;
+            top: 5px;
+            background: #fee2e2;
+            color: #ef4444;
+            border: none;
+            border-radius: 8px;
+            height: 35px;
+            width: 35px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        @media (max-width: 900px) {
+            .remove-btn {
+                position: static;
+                width: 100%;
+                margin-top: 5px;
+                height: 30px;
+            }
+        }
+
+        .btn-add {
+            background: none;
+            border: 2px dashed var(--primary-blue);
+            color: var(--primary-blue);
+            padding: 12px;
+            width: 100%;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            margin: 10px 0 25px 0;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 16px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <div class="header-section">
+        <h2>Daily Attendance Report</h2>
+        <p id="displayDate"></p>
+    </div>
+    
+    <form id="attendanceForm">
+        <label>Teacher's Name</label>
+        <input type="text" id="teacherName" placeholder="Full name" required>
+
+        <label>Class</label>
+        <input type="text" id="className" placeholder="e.g. 1 Dinamik" required>
+
+        <label>Absent Students & Reasons</label>
+        <div id="studentList">
+            <div class="student-row-wrapper">
+                <div class="student-grid">
+                    <textarea class="auto-expand" placeholder="Student Name" required oninput="adjustHeight(this)"></textarea>
+                    <textarea class="auto-expand" placeholder="Reason for Absence" required oninput="adjustHeight(this)"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn-add" onclick="addStudent()">+ Add Another Student</button>
+        <button type="button" class="submit-btn" onclick="handleSubmission()">Submit Report</button>
+    </form>
+</div>
+
+<script>
+    // Set current date
+    document.getElementById('displayDate').innerText = new Date().toLocaleDateString('en-US', { 
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+    });
+
+    // Helper: Auto-expand textareas
+    function adjustHeight(el) {
+        el.style.height = 'auto';
+        el.style.height = (el.scrollHeight) + 'px';
+    }
+
+    // Helper: Add new student row
+    function addStudent() {
+        const container = document.getElementById('studentList');
+        const wrapper = document.createElement('div');
+        wrapper.className = 'student-row-wrapper';
+        wrapper.innerHTML = `
+            <div class="student-grid">
+                <textarea class="auto-expand" placeholder="Student Name" required oninput="adjustHeight(this)"></textarea>
+                <textarea class="auto-expand" placeholder="Reason for Absence" required oninput="adjustHeight(this)"></textarea>
+            </div>
+            <button type="button" class="remove-btn" onclick="this.parentElement.remove()">✕</button>
+        `;
+        container.appendChild(wrapper);
+    }
+
+    async function handleSubmission() {
+        const form = document.getElementById('attendanceForm');
+        if(!form.checkValidity()) { form.reportValidity(); return; }
+
+        const submitBtn = document.querySelector('.submit-btn');
+        const originalText = submitBtn.innerText;
+
+        const teacherName = document.getElementById('teacherName').value;
+        const className = document.getElementById('className').value;
+
+        const rows = document.querySelectorAll('.student-row-wrapper');
+        const students = Array.from(rows).map(row => {
+            const inputs = row.querySelectorAll('textarea');
+            return {
+                name: inputs[0].value,
+                reason: inputs[1].value
+            };
+        });
+
+        const payload = { teacherName, className, students };
+
+        submitBtn.innerText = "Sending to Sheets...";
+        submitBtn.style.opacity = "0.7";
+        submitBtn.disabled = true;
+
+        try {
+            // Updated with your actual script URL
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbyLd_j9gqtkYERSqUEs3uxC3iSWcxv1Q8RSubTwpXCWhsMzOSR_wrqwuB_jwyrNIofL/exec';
+            
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            alert("Attendance Logged Successfully!");
+            location.reload(); 
+
+        } catch (error) {
+            console.error('Error!', error.message);
+            alert("Submission failed. Please check your connection.");
+            submitBtn.innerText = originalText;
+            submitBtn.style.opacity = "1";
+            submitBtn.disabled = false;
+        }
+    }
+</script>
+
+</body>
+</html>
