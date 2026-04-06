@@ -14,6 +14,7 @@
             --card-bg: #ffffff;
             --border-color: #e2e8f0;
             --border-radius: 12px;
+            --emerald: #10b981;
         }
 
         body {
@@ -44,8 +45,7 @@
         }
 
         .header-section h2 { margin: 0; color: var(--dark-navy); font-size: 1.8rem; font-weight: 700; }
-        .header-section p { color: #64748b; font-size: 0.95rem; margin-top: 0.5rem; }
-
+        
         label {
             display: block;
             font-weight: 600;
@@ -63,12 +63,10 @@
             box-sizing: border-box;
             font-size: 1rem;
             font-family: inherit;
-            transition: border-color 0.2s;
+            transition: all 0.2s;
         }
 
         input:focus, textarea:focus { outline: none; border-color: var(--primary-blue); }
-
-        #studentList { width: 100%; }
 
         .student-row-wrapper {
             position: relative;
@@ -91,7 +89,7 @@
 
         .remove-btn {
             position: absolute;
-            right: -55px;
+            right: -50px;
             top: 5px;
             background: #fee2e2;
             color: #ef4444;
@@ -101,15 +99,13 @@
             width: 35px;
             cursor: pointer;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        @media (max-width: 900px) {
-            .remove-btn {
-                position: static;
-                width: 100%;
-                margin-top: 5px;
-                height: 30px;
-            }
+        @media (max-width: 850px) {
+            .remove-btn { position: static; width: 100%; margin-top: 8px; }
         }
 
         .btn-add {
@@ -124,6 +120,7 @@
             cursor: pointer;
         }
 
+        /* Fixed Button Centering */
         .submit-btn {
             background-color: var(--primary-blue);
             color: white;
@@ -134,6 +131,66 @@
             width: 100%;
             font-size: 1.1rem;
             font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn.success { background-color: var(--emerald) !important; }
+	
+        /* Restored Smaller Date Box */
+        .date-container {
+            margin-top: 0.5rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .date-picker {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 6px 12px;
+            color: #64748b;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            width: auto; 
+            margin-bottom: 0; 
+        }
+
+        /* Spinner for Loading State */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Modal Styling */
+        #reviewModal {
+            display:none; 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(15, 23, 42, 0.85); 
+            backdrop-filter: blur(4px); 
+            z-index: 1000; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white; 
+            width: 100%; 
+            max-width: 500px; 
+            border-radius: 16px; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
@@ -142,7 +199,9 @@
 <div class="form-container">
     <div class="header-section">
         <h2>Daily Attendance Report</h2>
-        <p id="displayDate"></p>
+        <div class="date-container">
+            <input type="date" id="attendanceDate" class="date-picker">
+        </div>
     </div>
     
     <form id="attendanceForm">
@@ -163,23 +222,36 @@
         </div>
 
         <button type="button" class="btn-add" onclick="addStudent()">+ Add Another Student</button>
-        <button type="button" class="submit-btn" onclick="handleSubmission()">Submit Report</button>
+        <button type="button" class="submit-btn" id="mainSubmitBtn" onclick="openReview()">Submit Report</button>
     </form>
 </div>
 
-<script>
-    // Set current date
-    document.getElementById('displayDate').innerText = new Date().toLocaleDateString('en-US', { 
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
-    });
+<div id="reviewModal">
+    <div class="modal-content">
+        <div style="padding: 24px; border-bottom: 1px solid #e2e8f0;">
+            <h3 style="margin: 0; color: #0f172a;">Review Submission</h3>
+        </div>
+        <div id="reviewBody" style="padding: 24px; max-height: 400px; overflow-y: auto; color: #475569;"></div>
+        <div style="padding: 16px; background: #f8fafc; display: flex; gap: 12px; justify-content: flex-end; border-radius: 0 0 16px 16px;">
+            <button type="button" onclick="closeReview()" style="background: none; border: none; color: #64748b; cursor: pointer; font-weight: 600;">Edit</button>
+            <button type="button" id="confirmBtn" onclick="finalSubmit()" style="background: #0ea5e9; color: white; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">Confirm & Send</button>
+        </div>
+    </div>
+</div>
 
-    // Helper: Auto-expand textareas
+<script>
+    let pendingPayload = null;
+
+    // Set default date to today
+    window.onload = () => {
+        document.getElementById('attendanceDate').value = new Date().toISOString().split('T')[0];
+    };
+
     function adjustHeight(el) {
         el.style.height = 'auto';
         el.style.height = (el.scrollHeight) + 'px';
     }
 
-    // Helper: Add new student row
     function addStudent() {
         const container = document.getElementById('studentList');
         const wrapper = document.createElement('div');
@@ -194,51 +266,62 @@
         container.appendChild(wrapper);
     }
 
-    async function handleSubmission() {
+    function openReview() {
         const form = document.getElementById('attendanceForm');
         if(!form.checkValidity()) { form.reportValidity(); return; }
-
-        const submitBtn = document.querySelector('.submit-btn');
-        const originalText = submitBtn.innerText;
-
-        const teacherName = document.getElementById('teacherName').value;
-        const className = document.getElementById('className').value;
 
         const rows = document.querySelectorAll('.student-row-wrapper');
         const students = Array.from(rows).map(row => {
             const inputs = row.querySelectorAll('textarea');
-            return {
-                name: inputs[0].value,
-                reason: inputs[1].value
-            };
+            return { name: inputs[0].value, reason: inputs[1].value };
         });
 
-        const payload = { teacherName, className, students };
+        pendingPayload = {
+            teacherName: document.getElementById('teacherName').value,
+            className: document.getElementById('className').value,
+            attendanceDate: document.getElementById('attendanceDate').value,
+            students: students
+        };
 
-        submitBtn.innerText = "Sending to Sheets...";
-        submitBtn.style.opacity = "0.7";
-        submitBtn.disabled = true;
+        document.getElementById('reviewBody').innerHTML = `
+            <p><strong>Teacher:</strong> ${pendingPayload.teacherName}</p>
+            <p><strong>Class:</strong> ${pendingPayload.className}</p>
+            <p><strong>Date:</strong> ${pendingPayload.attendanceDate}</p>
+            <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+            <p><strong>Students:</strong></p>
+            <ul style="padding-left:20px">${students.map(s => `<li><b>${s.name}</b>: ${s.reason}</li>`).join('')}</ul>
+        `;
+        document.getElementById('reviewModal').style.display = 'flex';
+    }
+
+    function closeReview() { document.getElementById('reviewModal').style.display = 'none'; }
+
+    async function finalSubmit() {
+        const confirmBtn = document.getElementById('confirmBtn');
+        const mainBtn = document.getElementById('mainSubmitBtn');
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyY5DFFFvtESWwj_IBBkoe9hiIP4d1bvJVVXFj1K7AMjGim1i949WePt9S3aLTasYUK/exec';
+
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '<span>Sending...</span> <div class="spinner"></div>';
 
         try {
-            // Updated with your actual script URL
-            const scriptURL = 'https://script.google.com/macros/s/AKfycbyLd_j9gqtkYERSqUEs3uxC3iSWcxv1Q8RSubTwpXCWhsMzOSR_wrqwuB_jwyrNIofL/exec';
-            
             await fetch(scriptURL, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(pendingPayload)
             });
 
-            alert("Attendance Logged Successfully!");
-            location.reload(); 
+            closeReview();
+            mainBtn.classList.add('success');
+            mainBtn.innerHTML = '✓ Report Logged Successfully';
+            mainBtn.disabled = true;
 
-        } catch (error) {
-            console.error('Error!', error.message);
-            alert("Submission failed. Please check your connection.");
-            submitBtn.innerText = originalText;
-            submitBtn.style.opacity = "1";
-            submitBtn.disabled = false;
+            setTimeout(() => { location.reload(); }, 3000);
+        } catch (e) {
+            alert("Error submitting. Try again.");
+            confirmBtn.disabled = false;
+            confirmBtn.innerText = "Confirm & Send";
         }
     }
 </script>
