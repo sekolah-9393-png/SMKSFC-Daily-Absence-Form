@@ -36,7 +36,7 @@
             border-radius: var(--border-radius);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
             width: 100%;
-            max-width: 750px;
+            max-width: 850px; /* Slightly wider to fit 3 columns */
         }
 
         .header-section {
@@ -76,8 +76,9 @@
 
         .student-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            /* Grid updated for 3 columns */
+            grid-template-columns: 1.2fr 1.2fr 1fr; 
+            gap: 12px;
             width: 100%;
         }
 
@@ -89,7 +90,7 @@
 
         .remove-btn {
             position: absolute;
-            right: -50px;
+            right: -45px;
             top: 5px;
             background: #fee2e2;
             color: #ef4444;
@@ -104,8 +105,14 @@
             justify-content: center;
         }
 
-        @media (max-width: 850px) {
+        /* Mobile Responsiveness */
+        @media (max-width: 900px) {
             .remove-btn { position: static; width: 100%; margin-top: 8px; }
+            .form-container { padding: 1.5rem; }
+        }
+
+        @media (max-width: 600px) {
+            .student-grid { grid-template-columns: 1fr; } /* Stack on small screens */
         }
 
         .btn-add {
@@ -120,7 +127,6 @@
             cursor: pointer;
         }
 
-        /* Fixed Button Centering */
         .submit-btn {
             background-color: var(--primary-blue);
             color: white;
@@ -139,8 +145,7 @@
         }
 
         .submit-btn.success { background-color: var(--emerald) !important; }
-	
-        /* Restored Smaller Date Box */
+    
         .date-container {
             margin-top: 0.5rem;
             display: flex;
@@ -160,7 +165,6 @@
             margin-bottom: 0; 
         }
 
-        /* Spinner for Loading State */
         .spinner {
             width: 20px;
             height: 20px;
@@ -172,7 +176,6 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Modal Styling */
         #reviewModal {
             display:none; 
             position: fixed; 
@@ -188,7 +191,7 @@
         .modal-content {
             background: white; 
             width: 100%; 
-            max-width: 500px; 
+            max-width: 550px; 
             border-radius: 16px; 
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
@@ -202,6 +205,7 @@
         <div class="date-container">
             <input type="date" id="attendanceDate" class="date-picker">
         </div>
+    </div>
     
     <form id="attendanceForm">
         <label>Teacher's Name</label>
@@ -210,12 +214,13 @@
         <label>Class</label>
         <input type="text" id="className" placeholder="e.g. 1 Dinamik" required>
 
-        <label>Absent Students & Reasons</label>
+        <label>Absent Students, Reasons & Contacts</label>
         <div id="studentList">
             <div class="student-row-wrapper">
                 <div class="student-grid">
                     <textarea class="auto-expand" placeholder="Student Name" required oninput="adjustHeight(this)"></textarea>
                     <textarea class="auto-expand" placeholder="Reason for Absence" required oninput="adjustHeight(this)"></textarea>
+                    <textarea class="auto-expand" placeholder="Contact No." required oninput="adjustHeight(this)"></textarea>
                 </div>
             </div>
         </div>
@@ -241,7 +246,6 @@
 <script>
     let pendingPayload = null;
 
-    // Set default date to today
     window.onload = () => {
         document.getElementById('attendanceDate').value = new Date().toISOString().split('T')[0];
     };
@@ -259,6 +263,7 @@
             <div class="student-grid">
                 <textarea class="auto-expand" placeholder="Student Name" required oninput="adjustHeight(this)"></textarea>
                 <textarea class="auto-expand" placeholder="Reason for Absence" required oninput="adjustHeight(this)"></textarea>
+                <textarea class="auto-expand" placeholder="Contact No." required oninput="adjustHeight(this)"></textarea>
             </div>
             <button type="button" class="remove-btn" onclick="this.parentElement.remove()">✕</button>
         `;
@@ -272,7 +277,11 @@
         const rows = document.querySelectorAll('.student-row-wrapper');
         const students = Array.from(rows).map(row => {
             const inputs = row.querySelectorAll('textarea');
-            return { name: inputs[0].value, reason: inputs[1].value };
+            return { 
+                name: inputs[0].value, 
+                reason: inputs[1].value,
+                contact: inputs[2].value 
+            };
         });
 
         pendingPayload = {
@@ -288,7 +297,12 @@
             <p><strong>Date:</strong> ${pendingPayload.attendanceDate}</p>
             <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
             <p><strong>Students:</strong></p>
-            <ul style="padding-left:20px">${students.map(s => `<li><b>${s.name}</b>: ${s.reason}</li>`).join('')}</ul>
+            <ul style="padding-left:20px">${students.map(s => `
+                <li style="margin-bottom:8px">
+                    <b>${s.name}</b><br>
+                    <small>Reason: ${s.reason} | Contact: ${s.contact}</small>
+                </li>`).join('')}
+            </ul>
         `;
         document.getElementById('reviewModal').style.display = 'flex';
     }
@@ -298,7 +312,7 @@
     async function finalSubmit() {
         const confirmBtn = document.getElementById('confirmBtn');
         const mainBtn = document.getElementById('mainSubmitBtn');
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyY5DFFFvtESWwj_IBBkoe9hiIP4d1bvJVVXFj1K7AMjGim1i949WePt9S3aLTasYUK/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyvkVDbZyMzl2h1hVx_UxsqBT9Dr1Vi-qdO9REDE8o-DiT6uU12ztdIr1IGVhUWjJXD/exec';
 
         confirmBtn.disabled = true;
         confirmBtn.innerHTML = '<span>Sending...</span> <div class="spinner"></div>';
