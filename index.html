@@ -10,7 +10,6 @@
         :root {
             --primary-blue: #0ea5e9;
             --dark-navy: #0f172a;
-            --bg-dark-blue: #1e293b;
             --card-bg: #ffffff;
             --border-color: #e2e8f0;
             --border-radius: 12px;
@@ -20,181 +19,123 @@
         body {
             background-color: var(--dark-navy); 
             background-image: radial-gradient(circle at top left, #1e293b 0%, #0f172a 100%);
-            color: var(--dark-navy);
             font-family: 'Inter', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 40px 20px;
+            padding: 20px 10px;
         }
 
         .form-container {
             background: var(--card-bg);
-            padding: 2.5rem;
+            padding: 2rem;
             border-radius: var(--border-radius);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
             width: 100%;
-            max-width: 850px; /* Slightly wider to fit 3 columns */
+            max-width: 850px;
         }
 
-        .header-section {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .header-section h2 { margin: 0; color: var(--dark-navy); font-size: 1.8rem; font-weight: 700; }
+        .header-section { text-align: center; margin-bottom: 2rem; }
+        .header-section h2 { margin: 0; color: var(--dark-navy); font-size: 1.6rem; }
         
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            color: var(--dark-navy);
-        }
+        label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.85rem; }
 
         input, textarea {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
+            padding: 10px;
+            margin-bottom: 15px;
             border: 2px solid var(--border-color);
             border-radius: var(--border-radius);
             box-sizing: border-box;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-family: inherit;
-            transition: all 0.2s;
         }
-
-        input:focus, textarea:focus { outline: none; border-color: var(--primary-blue); }
 
         .student-row-wrapper {
             position: relative;
             margin-bottom: 15px;
-            width: 100%;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 10px;
         }
 
+        /* Fixed 3-column grid for ALL screen sizes */
         .student-grid {
             display: grid;
-            /* Grid updated for 3 columns */
-            grid-template-columns: 1.2fr 1.2fr 1fr; 
-            gap: 12px;
+            grid-template-columns: 1fr 1fr 0.8fr; 
+            gap: 8px;
             width: 100%;
         }
 
         textarea.auto-expand {
             resize: none;
-            min-height: 45px;
+            min-height: 40px;
+            padding: 8px;
+            font-size: 0.85rem;
             margin-bottom: 0;
         }
 
+        /* Floating Remove Button to save horizontal space on mobile */
         .remove-btn {
             position: absolute;
-            right: -45px;
-            top: 5px;
-            background: #fee2e2;
-            color: #ef4444;
+            right: -5px;
+            top: -12px;
+            background: #ef4444;
+            color: white;
             border: none;
-            border-radius: 8px;
-            height: 35px;
-            width: 35px;
+            border-radius: 50%;
+            height: 22px;
+            width: 22px;
             cursor: pointer;
-            font-weight: bold;
+            font-size: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        /* Mobile Responsiveness */
-        @media (max-width: 900px) {
-            .remove-btn { position: static; width: 100%; margin-top: 8px; }
-            .form-container { padding: 1.5rem; }
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
         @media (max-width: 600px) {
-            .student-grid { grid-template-columns: 1fr; } /* Stack on small screens */
+            .form-container { padding: 1.25rem 1rem; }
+            .header-section h2 { font-size: 1.4rem; }
+            .student-grid { gap: 5px; } /* Tighter gap on small phones */
+            textarea.auto-expand { padding: 6px; font-size: 0.8rem; }
         }
 
         .btn-add {
             background: none;
             border: 2px dashed var(--primary-blue);
             color: var(--primary-blue);
-            padding: 12px;
+            padding: 10px;
             width: 100%;
             border-radius: var(--border-radius);
             font-weight: 600;
-            margin: 10px 0 25px 0;
+            margin: 10px 0 20px 0;
             cursor: pointer;
         }
 
         .submit-btn {
             background-color: var(--primary-blue);
             color: white;
-            padding: 16px;
+            padding: 14px;
             border: none;
             border-radius: var(--border-radius);
             cursor: pointer;
             width: 100%;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            transition: all 0.3s ease;
         }
 
         .submit-btn.success { background-color: var(--emerald) !important; }
-    
-        .date-container {
-            margin-top: 0.5rem;
-            display: flex;
-            justify-content: center;
-        }
+        .date-picker { width: auto; font-size: 0.9rem; padding: 5px 10px; }
 
-        .date-picker {
-            background: transparent;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 6px 12px;
-            color: #64748b;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            cursor: pointer;
-            width: auto; 
-            margin-bottom: 0; 
-        }
-
-        .spinner {
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
+        /* Modal fixes */
         #reviewModal {
-            display:none; 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(15, 23, 42, 0.85); 
-            backdrop-filter: blur(4px); 
-            z-index: 1000; 
-            justify-content: center; 
-            align-items: center; 
-            padding: 20px;
+            display:none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); 
+            z-index: 1000; justify-content: center; align-items: center; padding: 15px;
         }
-
-        .modal-content {
-            background: white; 
-            width: 100%; 
-            max-width: 550px; 
-            border-radius: 16px; 
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        }
+        .modal-content { background: white; width: 100%; max-width: 500px; border-radius: 12px; overflow: hidden; }
     </style>
 </head>
 <body>
@@ -202,9 +143,7 @@
 <div class="form-container">
     <div class="header-section">
         <h2>Daily Absence Form</h2>
-        <div class="date-container">
-            <input type="date" id="attendanceDate" class="date-picker">
-        </div>
+        <input type="date" id="attendanceDate" class="date-picker">
     </div>
     
     <form id="attendanceForm">
@@ -214,31 +153,31 @@
         <label>Class</label>
         <input type="text" id="className" placeholder="e.g. 1 Dinamik" required>
 
-        <label>Absent Students, Reasons & Contacts</label>
+        <label>Students (Name | Reason | Contact)</label>
         <div id="studentList">
             <div class="student-row-wrapper">
                 <div class="student-grid">
-                    <textarea class="auto-expand" placeholder="Student Name" required oninput="adjustHeight(this)"></textarea>
-                    <textarea class="auto-expand" placeholder="Reason for Absence" required oninput="adjustHeight(this)"></textarea>
-                    <textarea class="auto-expand" placeholder="Contact No." required oninput="adjustHeight(this)"></textarea>
+                    <textarea class="auto-expand" placeholder="Name" required oninput="adjustHeight(this)"></textarea>
+                    <textarea class="auto-expand" placeholder="Reason" required oninput="adjustHeight(this)"></textarea>
+                    <textarea class="auto-expand" placeholder="Contact" required oninput="adjustHeight(this)"></textarea>
                 </div>
             </div>
         </div>
 
-        <button type="button" class="btn-add" onclick="addStudent()">+ Add Another Student</button>
+        <button type="button" class="btn-add" onclick="addStudent()">+ Add Student</button>
         <button type="button" class="submit-btn" id="mainSubmitBtn" onclick="openReview()">Submit</button>
     </form>
 </div>
 
 <div id="reviewModal">
     <div class="modal-content">
-        <div style="padding: 24px; border-bottom: 1px solid #e2e8f0;">
-            <h3 style="margin: 0; color: #0f172a;">Review Submission</h3>
+        <div style="padding: 20px; border-bottom: 1px solid #eee;">
+            <h3 style="margin: 0;">Review Details</h3>
         </div>
-        <div id="reviewBody" style="padding: 24px; max-height: 400px; overflow-y: auto; color: #475569;"></div>
-        <div style="padding: 16px; background: #f8fafc; display: flex; gap: 12px; justify-content: flex-end; border-radius: 0 0 16px 16px;">
-            <button type="button" onclick="closeReview()" style="background: none; border: none; color: #64748b; cursor: pointer; font-weight: 600;">Edit</button>
-            <button type="button" id="confirmBtn" onclick="finalSubmit()" style="background: #0ea5e9; color: white; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;">Confirm & Send</button>
+        <div id="reviewBody" style="padding: 20px; max-height: 350px; overflow-y: auto; font-size: 0.9rem;"></div>
+        <div style="padding: 15px; background: #f8fafc; display: flex; gap: 10px; justify-content: flex-end;">
+            <button type="button" onclick="closeReview()" style="border:none; background:none; cursor:pointer;">Edit</button>
+            <button type="button" id="confirmBtn" onclick="finalSubmit()" style="background:#0ea5e9; color:white; border:none; padding:8px 20px; border-radius:6px; font-weight:700; cursor:pointer;">Confirm & Send</button>
         </div>
     </div>
 </div>
@@ -261,9 +200,9 @@
         wrapper.className = 'student-row-wrapper';
         wrapper.innerHTML = `
             <div class="student-grid">
-                <textarea class="auto-expand" placeholder="Student Name" required oninput="adjustHeight(this)"></textarea>
-                <textarea class="auto-expand" placeholder="Reason for Absence" required oninput="adjustHeight(this)"></textarea>
-                <textarea class="auto-expand" placeholder="Contact No." required oninput="adjustHeight(this)"></textarea>
+                <textarea class="auto-expand" placeholder="Name" required oninput="adjustHeight(this)"></textarea>
+                <textarea class="auto-expand" placeholder="Reason" required oninput="adjustHeight(this)"></textarea>
+                <textarea class="auto-expand" placeholder="Contact" required oninput="adjustHeight(this)"></textarea>
             </div>
             <button type="button" class="remove-btn" onclick="this.parentElement.remove()">✕</button>
         `;
@@ -277,11 +216,7 @@
         const rows = document.querySelectorAll('.student-row-wrapper');
         const students = Array.from(rows).map(row => {
             const inputs = row.querySelectorAll('textarea');
-            return { 
-                name: inputs[0].value, 
-                reason: inputs[1].value,
-                contact: inputs[2].value 
-            };
+            return { name: inputs[0].value, reason: inputs[1].value, contact: inputs[2].value };
         });
 
         pendingPayload = {
@@ -292,17 +227,11 @@
         };
 
         document.getElementById('reviewBody').innerHTML = `
-            <p><strong>Teacher:</strong> ${pendingPayload.teacherName}</p>
-            <p><strong>Class:</strong> ${pendingPayload.className}</p>
-            <p><strong>Date:</strong> ${pendingPayload.attendanceDate}</p>
-            <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
-            <p><strong>Students:</strong></p>
-            <ul style="padding-left:20px">${students.map(s => `
-                <li style="margin-bottom:8px">
-                    <b>${s.name}</b><br>
-                    <small>Reason: ${s.reason} | Contact: ${s.contact}</small>
-                </li>`).join('')}
-            </ul>
+            <p><b>Teacher:</b> ${pendingPayload.teacherName}</p>
+            <p><b>Class:</b> ${pendingPayload.className}</p>
+            <p><b>Date:</b> ${pendingPayload.attendanceDate}</p>
+            <hr>
+            ${students.map(s => `<p>• <b>${s.name}</b>: ${s.reason} (${s.contact})</p>`).join('')}
         `;
         document.getElementById('reviewModal').style.display = 'flex';
     }
@@ -312,10 +241,10 @@
     async function finalSubmit() {
         const confirmBtn = document.getElementById('confirmBtn');
         const mainBtn = document.getElementById('mainSubmitBtn');
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxIruTVZZFxQrnjT_DMwttrwiQyHRlUnUTwtftv7eCV5nZ6WBz3PPNl1o6PmdtDckuP/exec';
+        const scriptURL = 'YOUR_GOOGLE_SCRIPT_URL';
 
         confirmBtn.disabled = true;
-        confirmBtn.innerHTML = '<span>Sending...</span> <div class="spinner"></div>';
+        confirmBtn.innerText = 'Sending...';
 
         try {
             await fetch(scriptURL, {
@@ -327,12 +256,11 @@
 
             closeReview();
             mainBtn.classList.add('success');
-            mainBtn.innerHTML = '✓ Form Submitted';
+            mainBtn.innerHTML = '✓ Submitted';
             mainBtn.disabled = true;
-
             setTimeout(() => { location.reload(); }, 3000);
         } catch (e) {
-            alert("Error submitting. Try again.");
+            alert("Error. Try again.");
             confirmBtn.disabled = false;
             confirmBtn.innerText = "Confirm & Send";
         }
